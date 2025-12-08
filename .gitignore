@@ -1,0 +1,69 @@
+###################################
+# React (synergy-ui)
+###################################
+
+# dependencies
+synergy-ui/node_modules/
+synergy-ui/.pnp
+synergy-ui/.pnp.js
+
+# production build
+synergy-ui/build/
+synergy-ui/dist/
+
+# environment files
+synergy-ui/.env*
+!synergy-ui/.env.example
+
+# log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# cache
+synergy-ui/.cache/
+synergy-ui/.vite/
+
+
+###################################
+# Spring Boot (synergy-api)
+###################################
+
+# Maven
+synergy-api/target/
+synergy-api/.mvn/
+synergy-api/mvnw
+synergy-api/mvnw.cmd
+
+# Gradle (if used in future)
+synergy-api/.gradle/
+synergy-api/build/
+
+# IDE files
+*.iml
+synergy-api/.idea/
+synergy-api/.classpath
+synergy-api/.project
+synergy-api/.settings/
+
+# logs and temp
+synergy-api/logs/
+synergy-api/tmp/
+
+
+###################################
+# OS / Editor
+###################################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# swap files
+*.swp
+*.swo
