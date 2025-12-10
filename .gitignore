@@ -49,6 +49,7 @@ synergy-api/.settings/
 # logs and temp
 synergy-api/logs/
 synergy-api/tmp/
+synergy/src/main/resources/application.properties
 
 
 ###################################
