@@ -1,5 +1,5 @@
 ###################################
-# React (synergy-ui)
+# React Frontend (synergy-ui)
 ###################################
 
 # dependencies
@@ -7,7 +7,7 @@ synergy-ui/node_modules/
 synergy-ui/.pnp
 synergy-ui/.pnp.js
 
-# production build
+# production builds
 synergy-ui/build/
 synergy-ui/dist/
 
@@ -15,27 +15,25 @@ synergy-ui/dist/
 synergy-ui/.env*
 !synergy-ui/.env.example
 
-# log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # cache
 synergy-ui/.cache/
 synergy-ui/.vite/
 
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 
 ###################################
-# Spring Boot (synergy-api)
+# Spring Boot Backend (synergy-api)
 ###################################
 
-# Maven
+# Maven / Gradle
 synergy-api/target/
 synergy-api/.mvn/
 synergy-api/mvnw
 synergy-api/mvnw.cmd
-
-# Gradle (if used in future)
 synergy-api/.gradle/
 synergy-api/build/
 
@@ -49,7 +47,34 @@ synergy-api/.settings/
 # logs and temp
 synergy-api/logs/
 synergy-api/tmp/
+
+# configuration (keep template only)
 synergy-api/src/main/resources/application.properties
+synergy-api/src/main/resources/application-*.properties
+!synergy-api/src/main/resources/application.example.properties
+
+
+###################################
+# WebRTC Signaling Server (synergy-signaling)
+###################################
+
+# dependencies
+synergy-signaling/node_modules/
+
+# environment files
+synergy-signaling/.env*
+!synergy-signaling/.env.example
+
+# keystore / certs / secrets
+
+**/*.p12
+**/*.pem
+**/*.key
+**/*.crt
+**/*.jks
+
+# logs
+synergy-signaling/logs/
 
 
 ###################################
@@ -62,7 +87,7 @@ synergy-api/src/main/resources/application.properties
 # Windows
 Thumbs.db
 
-# VSCode
+# VS Code
 .vscode/
 
 # swap files
