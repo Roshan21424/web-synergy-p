@@ -1,23 +1,31 @@
-import logo from './logo.svg';
+import { lazy, Suspense } from 'react';
 import './App.css';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import LoadingSpinner from './components/utils/LoadingSpinner';
+import Home from './components/Home';
+import ProtectedRoute from './routes/ProtectedRoute';
+
+
+
+
+const Login = lazy(() => import('./components/Login'));
+const Signup = lazy(() => import('./components/Signup'));
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+ <div className="App min-h-screen flex flex-col bg-gray-50">
+       <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+
+          <Route path="/" element={<ProtectedRoute />}>
+            <Route index element={<Navigate to="/home" replace />} />
+            <Route path="home" element={<Home />} />
+          </Route>
+
+        </Routes>
+       </Suspense>
     </div>
   );
 }
