@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
-const Pri = () => {
-  const token = localStorage.getItem("JWT_TOKEN");
+const ProtectedRoute = () => {
+  const token = sessionStorage.getItem("JWT_TOKEN"); // Use sessionStorage instead of localStorage for better security
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   try {
@@ -13,15 +13,19 @@ const Pri = () => {
     const currentTime = Date.now() / 1000;
 
     if (decoded.exp < currentTime) {
-      localStorage.removeItem("JWT_TOKEN");
-      return <Navigate to="/login" />;
+      // Token expired
+      sessionStorage.removeItem("JWT_TOKEN");
+      sessionStorage.removeItem("USER");
+      return <Navigate to="/login" replace />;
     }
 
     return <Outlet />;
   } catch (error) {
-    localStorage.removeItem("JWT_TOKEN");
-    return <Navigate to="/login" />;
+    console.error("Token validation error:", error);
+    sessionStorage.removeItem("JWT_TOKEN");
+    sessionStorage.removeItem("USER");
+    return <Navigate to="/login" replace />;
   }
 };
 
-export default Pri;
+export default ProtectedRoute;
