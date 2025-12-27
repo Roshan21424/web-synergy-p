@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/synergy-chat").addInterceptors(jwtHandshakeInterceptor) // 👈 added here
+        registry.addEndpoint("/synergy-chat").addInterceptors(jwtHandshakeInterceptor) //  added here
                 .setAllowedOriginPatterns("*").withSockJS();
     }
 }

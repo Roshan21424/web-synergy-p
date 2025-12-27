@@ -3,9 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../service/api";
 
 export default function Signup() {
-  const [formData, setFormData] = useState({ 
-    name: "", 
-    password: "" 
+  const [formData, setFormData] = useState({
+    name: "",
+    password: "",
   });
   const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
@@ -18,14 +18,20 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.name.length < 3) {
-      setMessage({ text: "Username must be at least 3 characters", type: "error" });
+      setMessage({
+        text: "Username must be at least 3 characters",
+        type: "error",
+      });
       return;
     }
-    
+
     if (formData.password.length < 8) {
-      setMessage({ text: "Password must be at least 8 characters", type: "error" });
+      setMessage({
+        text: "Password must be at least 8 characters",
+        type: "error",
+      });
       return;
     }
 
@@ -36,18 +42,19 @@ export default function Signup() {
       const response = await api.post("/auth/signup", formData);
 
       if (response.status === 200 || response.status === 201) {
-        setMessage({ 
-          text: "Account created successfully! Redirecting to login...", 
-          type: "success" 
+        setMessage({
+          text: "Account created successfully! Redirecting to login...",
+          type: "success",
         });
         setFormData({ name: "", password: "" });
-        
+
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message 
-        || err.response?.data 
-        || "Failed to create account. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Failed to create account. Please try again.";
       setMessage({ text: errorMessage, type: "error" });
     } finally {
       setLoading(false);
@@ -69,7 +76,10 @@ export default function Signup() {
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Username
             </label>
             <input
@@ -90,7 +100,10 @@ export default function Signup() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
             <input
@@ -119,8 +132,20 @@ export default function Signup() {
           {loading ? (
             <span className="flex items-center justify-center">
               <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Creating account...
             </span>
@@ -130,19 +155,21 @@ export default function Signup() {
         </button>
 
         {message.text && (
-          <div className={`mt-4 p-3 rounded-lg text-sm ${
-            message.type === "success" 
-              ? "bg-green-100 text-green-800 border border-green-200" 
-              : "bg-red-100 text-red-800 border border-red-200"
-          }`}>
+          <div
+            className={`mt-4 p-3 rounded-lg text-sm ${
+              message.type === "success"
+                ? "bg-green-100 text-green-800 border border-green-200"
+                : "bg-red-100 text-red-800 border border-red-200"
+            }`}
+          >
             {message.text}
           </div>
         )}
 
         <p className="text-center mt-6 text-sm text-gray-600">
           Already have an account?{" "}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="text-indigo-600 font-semibold hover:text-indigo-700 transition"
           >
             Login here
