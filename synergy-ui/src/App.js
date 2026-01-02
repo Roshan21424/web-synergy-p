@@ -4,7 +4,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LoadingSpinner from "./components/utils/LoadingSpinner";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Navbar from "./components/Navbar";
-
+import User from "./components/User"
+import Expert from "./components/Expert";
 const Login = lazy(() => import("./components/Login"));
 const Signup = lazy(() => import("./components/Signup"));
 const Home = lazy(() => import("./components/Home"));
@@ -23,6 +24,8 @@ function App() {
           <Route path="/" element={<ProtectedRoute />}>
             <Route index element={<Navigate to="/home" replace />} />
             <Route path="home" element={<Home />} />
+            <Route path="user" element={<User/>} />
+            <Route path="expert" element={<Expert />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/home" replace />} />
