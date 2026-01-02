@@ -15,6 +15,8 @@
     "react-dom": "^19.2.1",
     "react-router-dom": "^7.10.1",
     "react-scripts": "5.0.1",
+    "socket-io": "^1.0.0",
+    "socket.io-client": "^4.8.3",
     "sockjs-client": "^1.6.1",
     "web-vitals": "^2.1.4"
   },

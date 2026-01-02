@@ -4,12 +4,15 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LoadingSpinner from "./components/utils/LoadingSpinner";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Navbar from "./components/Navbar";
-import User from "./components/User"
-import Expert from "./components/Expert";
+
+
 const Login = lazy(() => import("./components/Login"));
 const Signup = lazy(() => import("./components/Signup"));
 const Home = lazy(() => import("./components/Home"));
-
+const User = lazy(() => import("./components/User"));
+const Expert = lazy(() => import("./components/Expert"));
+const UserSession = lazy(() => import("./components/UserSession"));
+const ExpertSession = lazy(() => import("./components/ExpertSession"));
 
 function App() {
   return (
@@ -26,6 +29,8 @@ function App() {
             <Route path="home" element={<Home />} />
             <Route path="user" element={<User/>} />
             <Route path="expert" element={<Expert />} />
+            <Route path="user_session/:id/:expert" element={<UserSession />} />
+            <Route path="expert_session/:id" element={<ExpertSession />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/home" replace />} />
