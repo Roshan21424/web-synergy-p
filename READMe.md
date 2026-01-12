@@ -1,1 +1,0 @@
-Synergy is a SaaS application that connects users with verified professionals from any field — software engineers, hardware specialists, designers, fitness coaches, mechanics, tutors, and many more. Users can instantly chat, call, or video-call experts, paying only for the time they use.
