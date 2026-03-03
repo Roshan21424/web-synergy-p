@@ -65,7 +65,7 @@ const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
         if (vid) vid.srcObject = null;
       });
     };
-  }, [userName, sessionId]);
+  }, [userName, sessionId,localRef,remoteRef]);
 
   const toggleTrack = (kind) => {
     if (!localRef.current?.srcObject) return;
