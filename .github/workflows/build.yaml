@@ -1,0 +1,39 @@
+name: Build App
+
+on:
+   workflow_dispatch:
+   push:
+        branches: [ main ]
+jobs:
+    build-frontend:
+        name: Build React # display name
+        runs-on: ubuntu-24.04
+
+        steps:
+
+          # load the repo in the runner
+          - name: Checkout Repository # step name
+            uses: actions/checkout@v4 # action to use
+
+          # start node
+          - name: Setup Node # step name
+            uses: actions/setup-node@v4 # action to use
+
+            # configuration
+            with: 
+              node-version: 20 
+          
+          # install node dependencies
+          - name: Install Dependencies # step name
+            run: npm install # script
+            working-directory: synergy-ui
+        
+          - name: Build React App
+            run: npm run build
+            working-directory: synergy-ui  
+          
+          - name: Upload Frontend Artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: frontend-build
+              path: synergy-ui/build
