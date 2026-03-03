@@ -12,7 +12,6 @@ import { useState } from "react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState("");
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);

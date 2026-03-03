@@ -5,7 +5,6 @@ let peerConnection;
 let localStream;
 let remoteStream;
 
-let pcReady = false;
 let pendingSignals = [];
 let pendingIce = [];
 
@@ -132,7 +131,6 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
     console.log("[PC] Connection state:", peerConnection.connectionState);
   };
 
-  pcReady = true;
 
   // Process any early messages (offer/answer/ICE) that arrived before PC existed
   while (pendingSignals.length) {

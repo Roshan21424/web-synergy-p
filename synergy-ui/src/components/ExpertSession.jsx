@@ -63,8 +63,8 @@ const ExpertSession = () => {
   const [input, setInput] = useState("")
   const [stompClient, setStompClient] = useState(null)
   const [myUserName] = useState(user.username)
-  const [localMic, setLocalMic] = useState(true)
-  const [localCam, setLocalCam] = useState(true)
+  const [localMic] = useState(true)
+  const [localCam] = useState(true)
 
   useEffect(() => {
     const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]))
