@@ -19,28 +19,54 @@ const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
   const [loadingRemote, setLoadingRemote] = useState(true);
   const [status, setStatus] = useState("Connecting...");
 
-useEffect(() => {
-  if (!sessionId || !userName) return;
+  useEffect(() => {
+    if (!sessionId || !userName) return;
+    let isMounted = true;
 
-  const localVideo = localRef.current;
-  const remoteVideo = remoteRef.current;
-
-  const socket = io("https://localhost:8181", {
-    auth: { userName, sessionId, role: "user" },
-  });
-
-  return () => {
-    socket.disconnect();
-
-    [localVideo, remoteVideo].forEach((vid) => {
-      const stream = vid?.srcObject;
-      if (stream) {
-        stream.getTracks().forEach((t) => t.stop());
-      }
-      if (vid) vid.srcObject = null;
+    const socket = io("https://localhost:8181", {
+      auth: { userName, sessionId, role: "user" },
     });
-  };
-}, [userName, sessionId, localRef, remoteRef]);
+
+    socket.on("connect", () => {
+      console.log("🔌 Connected to signaling server");
+      setStatus("Connected to signaling server...");
+    });
+
+    socket.on("waitingForExpert", () => {
+      console.log(" Waiting for expert...");
+      setStatus("Waiting for expert to join...");
+    });
+
+    socket.on("readyToStart", () => {
+      console.log("Expert joined, starting WebRTC call...");
+      setStatus("Connecting to expert...");
+      Call(userName, sessionId, localRef.current, remoteRef.current, "user", {
+        onLocalStreamReady: () => isMounted && setLoadingLocal(false),
+        onRemoteStreamReady: () => isMounted && setLoadingRemote(false),
+      });
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from signaling server");
+      setStatus("Disconnected. Please reload.");
+    });
+
+    const localVideo = localRef.current;
+    const remoteVideo = remoteRef.current;
+
+    return () => {
+      isMounted = false;
+      socket.disconnect();
+      [localVideo, remoteVideo].forEach((vid) => {
+        const stream = vid?.srcObject;
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+        }
+        if (vid) vid.srcObject = null;
+      });
+    };
+  }, [userName, sessionId]);
+
   const toggleTrack = (kind) => {
     if (!localRef.current?.srcObject) return;
     localRef.current.srcObject
