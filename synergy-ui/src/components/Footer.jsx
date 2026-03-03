@@ -8,7 +8,6 @@ import {
   Instagram,
   ArrowUp,
 } from "lucide-react";
-import { useState } from "react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -50,7 +49,7 @@ export default function Footer() {
               {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href="/"
                   title="coming soon"
                   className="w-10 h-10 cursor-not-allowed rounded-lg bg-white/5 border border-[#6A4222] flex items-center justify-center hover:bg-amber-600 hover:border-amber-600 transition-all"
                 >
@@ -92,7 +91,7 @@ export default function Footer() {
               ].map((item) => (
                 <li key={item}>
                   <a
-                    href="#"
+                    href="/"
                     className="flex items-center text-[#E9D5B5] hover:text-white transition"
                   >
                     {item}
@@ -135,7 +134,7 @@ export default function Footer() {
             {["Privacy Policy", "Terms", "Cookies"].map((item) => (
               <a
                 key={item}
-                href="#"
+                href="/"
                 className="hover:text-amber-400 transition"
               >
                 {item}

@@ -67,13 +67,13 @@ export default function Navbar() {
             ))}
             <div className="flex flex-col gap-3 pt-3">
               <a
-                href="#"
+                href="/"
                 className="px-5 py-3 rounded-xl bg-white text-amber-900 font-semibold border-2 border-amber-900 text-center hover:bg-amber-900 hover:text-amber-50 transition-all duration-300"
               >
                 Log out
               </a>
               <a
-                href="#cta"
+                href="/"
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-700 to-amber-800 text-amber-50 font-semibold text-center shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Get started

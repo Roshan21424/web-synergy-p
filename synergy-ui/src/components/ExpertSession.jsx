@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { Call } from "../service/scripts"
-import { User, PhoneOff, ArrowLeft } from "lucide-react"
-import { connect, sendMessage } from "../service/chatService.js"
-import { useMyContext } from "../context/ContextProvider.js"
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Call } from "../service/scripts";
+import { User, PhoneOff, ArrowLeft } from "lucide-react";
+import { connect, sendMessage } from "../service/chatService.js";
+import { useMyContext } from "../context/ContextProvider.js";
 
 const VideoBox = ({ refVideo, label, loading, children, micOff, videoOff }) => (
   <div className="relative w-full max-w-sm h-64 bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-200 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
@@ -14,8 +14,16 @@ const VideoBox = ({ refVideo, label, loading, children, micOff, videoOff }) => (
       <div className="flex flex-col">
         <span className="text-sm font-semibold text-gray-800">{label}</span>
         <div className="flex gap-1">
-          {micOff && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Mic off</span>}
-          {videoOff && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Video off</span>}
+          {micOff && (
+            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+              Mic off
+            </span>
+          )}
+          {videoOff && (
+            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+              Video off
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -36,7 +44,7 @@ const VideoBox = ({ refVideo, label, loading, children, micOff, videoOff }) => (
     />
     {children}
   </div>
-)
+);
 
 const ControlButton = ({ onClick, children }) => (
   <button
@@ -45,86 +53,100 @@ const ControlButton = ({ onClick, children }) => (
   >
     {children}
   </button>
-)
+);
 
 const ExpertSession = () => {
-  const { user } = useMyContext()
-  const navigate = useNavigate()
-  const { id } = useParams()
-  const [sessionId] = useState(id)
+  const { user } = useMyContext();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [sessionId] = useState(id);
 
-  const localVideoRef = useRef(null)
-  const remoteVideoRef = useRef(null)
-  const chatEndRef = useRef(null)
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const chatEndRef = useRef(null);
 
-  const [loadingLocal, setLoadingLocal] = useState(true)
-  const [loadingRemote, setLoadingRemote] = useState(true)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState("")
-  const [stompClient, setStompClient] = useState(null)
-  const [myUserName] = useState(user.username)
-  const [localMic] = useState(true)
-  const [localCam] = useState(true)
-
-  useEffect(() => {
-    const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]))
-    setStompClient(client)
-  }, [id])
+  const [loadingLocal, setLoadingLocal] = useState(true);
+  const [loadingRemote, setLoadingRemote] = useState(true);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [stompClient, setStompClient] = useState(null);
+  const [myUserName] = useState(user.username);
+  const [localMic] = useState(true);
+  const [localCam] = useState(true);
 
   useEffect(() => {
-    console.log("Messages updated:", messages)
-  }, [messages])
+  const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]))
+  setStompClient(client)
+
+  return () => {
+    client?.disconnect?.()
+  }
+}, [id])
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    console.log("Messages updated:", messages);
+  }, [messages]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || !stompClient?.connected) return
+    if (!input.trim() || !stompClient?.connected) return;
 
     const message = {
       service: { id: sessionId },
       senderId: myUserName,
       content: input,
-    }
+    };
 
-    sendMessage(stompClient, message)
-    setInput("")
-  }
+    sendMessage(stompClient, message);
+    setInput("");
+  };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") handleSend()
-  }
+    if (e.key === "Enter") handleSend();
+  };
 
   useEffect(() => {
-    if (!sessionId) return
+    if (!sessionId) return;
 
-    console.log("ExpertSession starting:", myUserName, "session:", sessionId)
+    const localVideo = localVideoRef.current;
+    const remoteVideo = remoteVideoRef.current;
 
-    Call(myUserName, sessionId, localVideoRef.current, remoteVideoRef.current, "expert", {
+    Call(myUserName, sessionId, localVideo, remoteVideo, "expert", {
       onLocalStreamReady: () => setLoadingLocal(false),
       onRemoteStreamReady: () => setLoadingRemote(false),
-    })
+    });
 
     return () => {
-      ;[localVideoRef.current, remoteVideoRef.current].forEach((vid) => {
-        vid?.srcObject?.getTracks().forEach((t) => t.stop())
-      })
-    }
-  }, [sessionId, myUserName])
+      [localVideo, remoteVideo].forEach((vid) => {
+        vid?.srcObject?.getTracks().forEach((t) => t.stop());
+        if (vid) vid.srcObject = null;
+      });
+    };
+  }, [sessionId, myUserName]);
 
   const hangUp = () => {
-    ;[localVideoRef.current, remoteVideoRef.current].forEach((vid) => {
-      vid?.srcObject?.getTracks().forEach((t) => t.stop())
-    })
-    navigate(-1)
-  }
+    const localVideo = localVideoRef.current;
+    const remoteVideo = remoteVideoRef.current;
+
+    [localVideo, remoteVideo].forEach((vid) => {
+      vid?.srcObject?.getTracks().forEach((t) => t.stop());
+      if (vid) vid.srcObject = null;
+    });
+
+    navigate(-1);
+  };
 
   return (
     <div className="flex flex-col h-screen w-screen bg-white text-gray-900 overflow-hidden">
       <div className="bg-gradient-to-r from-amber-500 to-amber-600 border-b border-amber-300 px-6 py-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-amber-400 rounded-lg transition-all">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-amber-400 rounded-lg transition-all"
+          >
             <ArrowLeft size={20} className="text-white" />
           </button>
           <div className="text-sm font-semibold text-white">
@@ -147,7 +169,11 @@ const ExpertSession = () => {
             videoOff={!localCam}
           />
 
-          <VideoBox refVideo={remoteVideoRef} label="Participant" loading={loadingRemote} />
+          <VideoBox
+            refVideo={remoteVideoRef}
+            label="Participant"
+            loading={loadingRemote}
+          />
         </div>
 
         <div className="md:w-1/2 w-full flex flex-col bg-gray-50 rounded-2xl border-2 border-amber-200 shadow-lg overflow-hidden">
@@ -157,10 +183,15 @@ const ExpertSession = () => {
 
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 && (
-              <p className="text-gray-400 text-center mt-10 text-sm">No messages yet. Start chatting below </p>
+              <p className="text-gray-400 text-center mt-10 text-sm">
+                No messages yet. Start chatting below{" "}
+              </p>
             )}
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.senderId === myUserName ? "justify-end" : "justify-start"}`}>
+              <div
+                key={i}
+                className={`flex ${m.senderId === myUserName ? "justify-end" : "justify-start"}`}
+              >
                 <div className="max-w-xs">
                   <p
                     className={`text-xs font-extrabold mb-1 ${m.senderId === myUserName ? "text-right text-amber-600" : "text-left text-gray-600"}`}
@@ -200,7 +231,7 @@ const ExpertSession = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ExpertSession
+export default ExpertSession;
