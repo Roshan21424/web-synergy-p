@@ -31,11 +31,8 @@ services:
           type: redis
           name: synergy-redis
           property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          type: redis
-          name: synergy-redis
-          property: password
+      # Note: Render free Redis has no password — REDIS_PASSWORD left unset
+      # so Spring Boot will connect without auth (which is correct)
 
       # JWT — Render will auto-generate a secure random value
       - key: JWT_SECRET
