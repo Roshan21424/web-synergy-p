@@ -14,7 +14,7 @@ services:
     envVars:
       # MySQL — fill these in after creating your Railway database
       - key: DATABASE_URL
-        sync: false          # you set this manually in Render dashboard
+        sync: false
       - key: DATABASE_USERNAME
         sync: false
       - key: DATABASE_PASSWORD
@@ -55,13 +55,11 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      # Your Netlify URL — set after deploying frontend
       - key: FRONTEND_URL
         sync: false
 
-# ── Managed Redis ────────────────────────────────────────────────────────────
-databases:
+  # ── Managed Redis ─────────────────────────────────────────────────────────
   - type: redis
     name: synergy-redis
     plan: free
-    ipAllowList: []          # only allow internal Render traffic
+    ipAllowList: []
