@@ -1,0 +1,67 @@
+# render.yaml — Render Blueprint
+# Declares all backend services so you can deploy them in one click.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── Spring Boot API ──────────────────────────────────────────────────────────
+  - type: web
+    name: synergy-api
+    runtime: docker
+    dockerfilePath: ./synergy-api/Dockerfile
+    dockerContext: ./synergy-api
+    plan: free
+    healthCheckPath: /auth/csrf
+    envVars:
+      # MySQL — fill these in after creating your Railway database
+      - key: DATABASE_URL
+        sync: false          # you set this manually in Render dashboard
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+
+      # Redis — auto-wired from the redis service below
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: synergy-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: synergy-redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: synergy-redis
+          property: password
+
+      # JWT — Render will auto-generate a secure random value
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Your Netlify URL — set after deploying frontend
+      - key: FRONTEND_URL
+        sync: false
+
+  # ── Node.js WebRTC Signaling Server ─────────────────────────────────────────
+  - type: web
+    name: synergy-signaling
+    runtime: docker
+    dockerfilePath: ./synergy-signaling/Dockerfile
+    dockerContext: ./synergy-signaling
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Your Netlify URL — set after deploying frontend
+      - key: FRONTEND_URL
+        sync: false
+
+# ── Managed Redis ────────────────────────────────────────────────────────────
+databases:
+  - type: redis
+    name: synergy-redis
+    plan: free
+    ipAllowList: []          # only allow internal Render traffic

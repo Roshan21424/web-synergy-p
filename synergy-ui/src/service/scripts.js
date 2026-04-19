@@ -15,6 +15,9 @@ const config = {
   ],
 };
 
+const SIGNALING_URL =
+  process.env.REACT_APP_SIGNALING_URL || "https://localhost:8181";
+
 export const Call = async (
   userName,
   sessionId,
@@ -25,7 +28,7 @@ export const Call = async (
 ) => {
   console.log(`[Call] Connecting as ${role} to session ${sessionId}`);
 
-  socket = io("https://localhost:8181", {
+  socket = io(SIGNALING_URL, {
     auth: { userName, sessionId, role },
   });
 
@@ -42,7 +45,6 @@ export const Call = async (
     await startCall(role, localVideo, remoteVideo, callbacks);
   });
 
-  // NEW: don't drop early messages — buffer until PC exists
   socket.on("signal", async (message) => {
     if (!peerConnection) {
       pendingSignals.push(message);
@@ -51,11 +53,9 @@ export const Call = async (
     await handleSignal(message);
   });
 
-  // NEW: expert creates offer only after user says readyForSdp
   socket.on("peerReadyForSdp", async () => {
     if (role !== "expert") return;
     console.log("[Handshake] peerReadyForSdp received → creating offer");
-
     try {
       if (peerConnection.signalingState !== "stable") {
         console.warn("[Expert] Not stable, skipping offer for now");
@@ -64,14 +64,14 @@ export const Call = async (
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       socket.emit("signal", offer);
-      console.log("[Expert]  Offer created & sent");
+      console.log("[Expert] Offer created & sent");
     } catch (err) {
-      console.error("[Expert]  Offer creation failed:", err);
+      console.error("[Expert] Offer creation failed:", err);
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("[Socket]  Disconnected from signaling server");
+    console.log("[Socket] Disconnected from signaling server");
   });
 };
 
@@ -80,7 +80,6 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
 
   peerConnection = new RTCPeerConnection(config);
 
-  // Local media
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -88,19 +87,20 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
     });
     localVideo.srcObject = localStream;
     callbacks?.onLocalStreamReady?.();
-    console.log("[Media]  Local media ready");
+    console.log("[Media] Local media ready");
   } catch (err) {
-    console.error("[Media]  getUserMedia failed:", err);
+    console.error("[Media] getUserMedia failed:", err);
     return;
   }
 
-  // Remote media
   remoteStream = new MediaStream();
   remoteVideo.srcObject = remoteStream;
   remoteVideo.onloadedmetadata = () => {
-  console.log("[Remote] Metadata loaded, playing stream");
-  remoteVideo.play().catch((e) => console.warn("[Remote] autoplay blocked:", e));
-};
+    console.log("[Remote] Metadata loaded, playing stream");
+    remoteVideo
+      .play()
+      .catch((e) => console.warn("[Remote] autoplay blocked:", e));
+  };
 
   peerConnection.ontrack = (event) => {
     event.streams[0].getTracks().forEach((t) => {
@@ -111,18 +111,14 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
     callbacks?.onRemoteStreamReady?.();
   };
 
-  // Add local tracks
-  // Add local tracks
   localStream.getTracks().forEach((t) => peerConnection.addTrack(t, localStream));
 
-  // If I'm the user (answerer), explicitly prepare to receive media
   if (role === "user") {
     console.log("[User] Adding recvonly transceivers for remote media");
     peerConnection.addTransceiver("video", { direction: "recvonly" });
     peerConnection.addTransceiver("audio", { direction: "recvonly" });
   }
 
-  // ICE handling (queue if no remoteDescription yet)
   peerConnection.onicecandidate = ({ candidate }) => {
     if (candidate) socket.emit("signal", { candidate });
   };
@@ -131,19 +127,13 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
     console.log("[PC] Connection state:", peerConnection.connectionState);
   };
 
-
-  // Process any early messages (offer/answer/ICE) that arrived before PC existed
   while (pendingSignals.length) {
     const msg = pendingSignals.shift();
     await handleSignal(msg);
   }
 
-  // If we already have pending ICE (arrived before remoteDescription), try to add them now
   await flushPendingIce();
 
-  // Handshake:
-  // - User tells expert "I'm ready for SDP" (so expert knows it's safe to create offer)
-  // - Expert waits for this event and then creates the offer
   if (role === "user") {
     socket.emit("readyForSdp");
     console.log("[Handshake] User emitted readyForSdp");
@@ -151,38 +141,38 @@ async function startCall(role, localVideo, remoteVideo, callbacks) {
 }
 
 async function handleSignal(message) {
-  // Offer
   if (message.type === "offer") {
-    console.log("[Signal]  Offer");
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(message));
-
+    console.log("[Signal] Offer");
+    await peerConnection.setRemoteDescription(
+      new RTCSessionDescription(message)
+    );
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     socket.emit("signal", peerConnection.localDescription);
-
     await flushPendingIce();
     return;
   }
 
-  // Answer
   if (message.type === "answer") {
-    console.log("[Signal]  Answer");
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(message));
+    console.log("[Signal] Answer");
+    await peerConnection.setRemoteDescription(
+      new RTCSessionDescription(message)
+    );
     await flushPendingIce();
     return;
   }
 
-  // ICE
   if (message.candidate) {
     if (!peerConnection.remoteDescription) {
-      // queue until we have a remote description
       pendingIce.push(message.candidate);
       return;
     }
     try {
-      await peerConnection.addIceCandidate(new RTCIceCandidate(message.candidate));
+      await peerConnection.addIceCandidate(
+        new RTCIceCandidate(message.candidate)
+      );
     } catch (err) {
-      console.error("[ICE]  addIceCandidate failed:", err);
+      console.error("[ICE] addIceCandidate failed:", err);
     }
   }
 }
@@ -195,7 +185,7 @@ async function flushPendingIce() {
     try {
       await peerConnection.addIceCandidate(new RTCIceCandidate(c));
     } catch (err) {
-      console.error("[ICE] ❌ addIceCandidate (flush) failed:", err);
+      console.error("[ICE] addIceCandidate (flush) failed:", err);
     }
   }
 }

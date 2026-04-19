@@ -6,6 +6,9 @@ import { Mic, MicOff, Video, VideoOff, PhoneOff, User, ArrowLeft, Send } from "l
 import { io } from "socket.io-client";
 import { useMyContext } from "../context/ContextProvider.js";
 
+const SIGNALING_URL =
+  process.env.REACT_APP_SIGNALING_URL || "https://localhost:8181";
+
 const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
   const [loadingLocal, setLoadingLocal] = useState(true);
   const [loadingRemote, setLoadingRemote] = useState(true);
@@ -15,12 +18,18 @@ const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
     if (!sessionId || !userName) return;
     let isMounted = true;
 
-    const socket = io("https://localhost:8181", {
+    const socket = io(SIGNALING_URL, {
       auth: { userName, sessionId, role: "user" },
     });
 
-    socket.on("connect", () => { console.log("🔌 Connected to signaling server"); setStatus("Connected to signaling server...") });
-    socket.on("waitingForExpert", () => { console.log(" Waiting for expert..."); setStatus("Waiting for expert to join...") });
+    socket.on("connect", () => {
+      console.log("🔌 Connected to signaling server");
+      setStatus("Connected to signaling server...");
+    });
+    socket.on("waitingForExpert", () => {
+      console.log("Waiting for expert...");
+      setStatus("Waiting for expert to join...");
+    });
     socket.on("readyToStart", () => {
       console.log("Expert joined, starting WebRTC call...");
       setStatus("Connecting to expert...");
@@ -29,7 +38,10 @@ const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
         onRemoteStreamReady: () => isMounted && setLoadingRemote(false),
       });
     });
-    socket.on("disconnect", () => { console.log("Disconnected from signaling server"); setStatus("Disconnected. Please reload.") });
+    socket.on("disconnect", () => {
+      console.log("Disconnected from signaling server");
+      setStatus("Disconnected. Please reload.");
+    });
 
     const localVideo = localRef.current;
     const remoteVideo = remoteRef.current;
@@ -47,7 +59,10 @@ const useCall = ({ userName, sessionId, localRef, remoteRef }) => {
 
   const toggleTrack = (kind) => {
     if (!localRef.current?.srcObject) return;
-    localRef.current.srcObject.getTracks().filter((t) => t.kind === kind).forEach((t) => (t.enabled = !t.enabled));
+    localRef.current.srcObject
+      .getTracks()
+      .filter((t) => t.kind === kind)
+      .forEach((t) => (t.enabled = !t.enabled));
   };
 
   return { loadingLocal, loadingRemote, toggleTrack, status };
@@ -110,7 +125,9 @@ const UserSession = () => {
     setInput("");
   };
 
-  const handleKeyPress = (e) => { if (e.key === "Enter") handleSend() };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") handleSend();
+  };
 
   const hangUp = () => {
     [localVideoRef.current, remoteVideoRef.current].forEach((vid) =>
@@ -135,7 +152,7 @@ const UserSession = () => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { toggleTrack("audio"); setLocalMic(!localMic) }}
+            onClick={() => { toggleTrack("audio"); setLocalMic(!localMic); }}
             disabled={loadingLocal}
             className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
           >
@@ -143,7 +160,7 @@ const UserSession = () => {
           </button>
 
           <button
-            onClick={() => { toggleTrack("video"); setLocalCam(!localCam) }}
+            onClick={() => { toggleTrack("video"); setLocalCam(!localCam); }}
             disabled={loadingLocal}
             className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
           >

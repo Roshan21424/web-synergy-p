@@ -1,9 +1,12 @@
-import { Client } from "@stomp/stompjs"; 
+import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 export const connect = (sessionId, onMessageReceived) => {
-  const token = localStorage.getItem("JWT_TOKEN");
-  const socket = new SockJS(`https://192.168.1.104:8080/synergy-chat?token=${token}`); 
+  // Use sessionStorage (consistent with rest of app — was incorrectly using localStorage)
+  const token = sessionStorage.getItem("JWT_TOKEN");
+  const backendUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:8080";
+
+  const socket = new SockJS(`${backendUrl}/synergy-chat?token=${token}`);
 
   const stompClient = new Client({
     webSocketFactory: () => socket,

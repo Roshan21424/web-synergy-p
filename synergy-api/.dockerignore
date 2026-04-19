@@ -1,0 +1,29 @@
+# Build output
+target/
+*.log
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Tests
+src/test/
+
+# Docs
+HELP.md
+README.md
+
+# Docker itself
+Dockerfile
+docker-compose.yml
+
+# Node (if any frontend later)
+node_modules/

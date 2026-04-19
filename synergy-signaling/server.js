@@ -1,46 +1,62 @@
-const fs = require("fs");
-const https = require("https");
+require("dotenv").config();
 const express = require("express");
 const socketio = require("socket.io");
 const app = express();
-const key = fs.readFileSync("cert.key");
-const cert = fs.readFileSync("cert.crt");
-const server = https.createServer({ key, cert }, app);
 
 app.use(express.static(__dirname));
 
+// ── Transport ─────────────────────────────────────────────────────────────────
+// Render terminates SSL at the load balancer, so the app speaks plain HTTP.
+// Locally we keep HTTPS with self-signed certs.
+let server;
+
+if (process.env.NODE_ENV === "production") {
+  const http = require("http");
+  server = http.createServer(app);
+} else {
+  try {
+    const fs = require("fs");
+    const https = require("https");
+    const key = fs.readFileSync("cert.key");
+    const cert = fs.readFileSync("cert.crt");
+    server = https.createServer({ key, cert }, app);
+  } catch (e) {
+    console.warn("SSL certs not found — falling back to HTTP for local dev");
+    const http = require("http");
+    server = http.createServer(app);
+  }
+}
+
+// ── Socket.IO ─────────────────────────────────────────────────────────────────
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://localhost:3000";
+
 const io = socketio(server, {
   cors: {
-    origin: ["https://192.168.1.104:3000"],
+    origin: [FRONTEND_URL],
     methods: ["GET", "POST"],
   },
 });
 
-server.listen(8181, "0.0.0.0", () =>
-  console.log("Signaling server running on :8181")
+const PORT = process.env.PORT || 8181;
+server.listen(PORT, "0.0.0.0", () =>
+  console.log(`Signaling server running on :${PORT}`)
 );
 
-const sessions = {}; 
+// ── Session registry ──────────────────────────────────────────────────────────
+const sessions = {};
 
 io.on("connection", (socket) => {
-  socket.on("readyForSdp", () => {
-    const { sessionId, role } = socket.data;
-    const targetRole = role === "user" ? "expert" : "user";
-    const targetId = sessions[sessionId]?.[targetRole];
-    if (targetId) {
-      io.to(targetId).emit("peerReadyForSdp");
-      console.log(`[HANDSHAKE] ${role} readyForSdp -> notify ${targetRole} in ${sessionId}`);
-    }
-  });
-
-
   const { userName, sessionId, role } = socket.handshake.auth || {};
   socket.data = { userName, sessionId, role };
 
   if (!sessionId || !role) return;
 
   if (!sessions[sessionId])
-    sessions[sessionId] = { user: null, expert: null, ready: { user: false, expert: false } };
+    sessions[sessionId] = {
+      user: null,
+      expert: null,
+      ready: { user: false, expert: false },
+    };
 
   sessions[sessionId][role] = socket.id;
 
@@ -52,6 +68,17 @@ io.on("connection", (socket) => {
     console.log(`[READY] ${role} ready in ${sessionId}`);
     checkIfBothReady(sessionId);
   }, 1000);
+
+  socket.on("readyForSdp", () => {
+    const targetRole = role === "user" ? "expert" : "user";
+    const targetId = sessions[sessionId]?.[targetRole];
+    if (targetId) {
+      io.to(targetId).emit("peerReadyForSdp");
+      console.log(
+        `[HANDSHAKE] ${role} readyForSdp -> notify ${targetRole} in ${sessionId}`
+      );
+    }
+  });
 
   socket.on("signal", (msg) => {
     const targetRole = role === "user" ? "expert" : "user";
