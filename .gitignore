@@ -48,11 +48,6 @@ synergy-api/.settings/
 synergy-api/logs/
 synergy-api/tmp/
 
-# configuration (keep template only)
-synergy-api/src/main/resources/application.properties
-synergy-api/src/main/resources/application-*.properties
-!synergy-api/src/main/resources/application.example.properties
-
 
 ###################################
 # WebRTC Signaling Server (synergy-signaling)
