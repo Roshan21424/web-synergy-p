@@ -21,16 +21,11 @@ services:
         sync: false
 
       # Redis — auto-wired from the redis service below
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromService:
-          type: redis
-          name: synergy-redis
-          property: host
-      - key: REDIS_PORT
-        fromService:
-          type: redis
-          name: synergy-redis
-          property: port
+         type: redis
+         name: synergy-redis
+         property: connectionString
       # Note: Render free Redis has no password — REDIS_PASSWORD left unset
       # so Spring Boot will connect without auth (which is correct)
 
