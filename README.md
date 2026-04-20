@@ -26,7 +26,7 @@ The system is designed to reflect **real-world expert consultation platforms** w
 
 ## System Architecture
 
-![Synergy Architecture Diagram](one.drawio.png)
+![Synergy Architecture Diagram](architecture.png)
 
 *High-level architecture showing separation between application logic, WebRTC signaling, and peer-to-peer media flow.*
 

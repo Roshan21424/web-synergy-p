@@ -1,90 +1,30 @@
-###################################
-# React Frontend (synergy-ui)
-###################################
+# React Frontend
 
 # dependencies
 synergy-ui/node_modules/
-synergy-ui/.pnp
-synergy-ui/.pnp.js
 
-# production builds
-synergy-ui/build/
-synergy-ui/dist/
+# certs and secrets
+synergy-ui/certs/
 
-# environment files
-synergy-ui/.env*
-!synergy-ui/.env.example
+# environment file
+synergy-ui/.env.development
 
-# cache
-synergy-ui/.cache/
-synergy-ui/.vite/
+# spring boot backend ----------
 
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# build output
+target/
 
 
-###################################
-# Spring Boot Backend (synergy-api)
-###################################
-
-# Maven / Gradle
-synergy-api/target/
-synergy-api/.mvn/
-synergy-api/mvnw
-synergy-api/mvnw.cmd
-synergy-api/.gradle/
-synergy-api/build/
-
-# IDE files
-*.iml
-synergy-api/.idea/
-synergy-api/.classpath
-synergy-api/.project
-synergy-api/.settings/
-
-# logs and temp
-synergy-api/logs/
-synergy-api/tmp/
-
-
-###################################
-# WebRTC Signaling Server (synergy-signaling)
-###################################
+# WebRTC Signaling Server ----------
 
 # dependencies
 synergy-signaling/node_modules/
 
-# environment files
-synergy-signaling/.env*
-!synergy-signaling/.env.example
+# certs and secrets
+synergy-signaling/certs/
 
-# keystore / certs / secrets
+# environment file
+synergy-signaling/.env.development
 
-**/*.p12
-**/*.pem
-**/*.key
-**/*.crt
-**/*.jks
-
-# logs
-synergy-signaling/logs/
-
-
-###################################
-# OS / Editor
-###################################
-
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-
-# VS Code
-.vscode/
-
-# swap files
-*.swp
-*.swo
+# root
+properties.txt

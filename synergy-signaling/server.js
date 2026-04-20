@@ -17,8 +17,8 @@ if (process.env.NODE_ENV === "production") {
   try {
     const fs = require("fs");
     const https = require("https");
-    const key = fs.readFileSync("cert.key");
-    const cert = fs.readFileSync("cert.crt");
+    const key = fs.readFileSync("certs/cert.key");
+    const cert = fs.readFileSync("certs/cert.pem");
     server = https.createServer({ key, cert }, app);
   } catch (e) {
     console.warn("SSL certs not found — falling back to HTTP for local dev");
@@ -39,7 +39,7 @@ const io = socketio(server, {
 
 const PORT = process.env.PORT || 8181;
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(`Signaling server running on :${PORT}`)
+  console.log(`Signaling server running on :${PORT}`),
 );
 
 // ── Session registry ──────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
     if (targetId) {
       io.to(targetId).emit("peerReadyForSdp");
       console.log(
-        `[HANDSHAKE] ${role} readyForSdp -> notify ${targetRole} in ${sessionId}`
+        `[HANDSHAKE] ${role} readyForSdp -> notify ${targetRole} in ${sessionId}`,
       );
     }
   });
