@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMyContext } from "../context/ContextProvider";
 import api from "../service/api";
 import { Loader2, ArrowLeft, User, Search } from "lucide-react";
-import { EXPERT_FIELDS, getSubFields } from "./expertFields";
+import { EXPERT_FIELDS, getSubFields } from "./ExpertFields";
 
 // ── Expert card ───────────────────────────────────────────────────────────────
 

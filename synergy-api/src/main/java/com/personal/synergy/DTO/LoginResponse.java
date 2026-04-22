@@ -13,12 +13,12 @@ public class LoginResponse {
     private String jwtToken;
     private String username;
     private List<String> roles;
-    private boolean is2factorAuthEnabled;
+    private boolean twoFactorAuthEnabled;
 
     public LoginResponse(String jwtToken, String username, List<String> roles) {
         this.jwtToken = jwtToken;
         this.username = username;
         this.roles = roles;
-        this.is2factorAuthEnabled = false;
+        this.twoFactorAuthEnabled = false;
     }
 }
