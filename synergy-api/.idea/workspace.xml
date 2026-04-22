@@ -5,32 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="17a12516-423f-45a2-acc0-32deb3d02672" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/CacheConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/EnvironmentValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/RateLimitConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/CacheConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/RateLimitConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SSEMangaer/SseEmitterManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SSEMangaer/SseEmitterManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/CacheConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/RateLimitConfig.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SynergyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SynergyApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/chat/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/chat/WebSocketConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/AuthenticationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/CallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/CallController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/entity/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/entity/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/SecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/SecurityConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/UserDetailsServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/AuthEntryPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/AuthEntryPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtHandshakeInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtHandshakeInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/Expert.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/Expert.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/User.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/User.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/UserSession.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/UserSession.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/context/ContextProvider.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/context/ContextProvider.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/routes/ProtectedRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/routes/ProtectedRoute.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../synergy-ui/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/service/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/service/chatService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/service/chatService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
