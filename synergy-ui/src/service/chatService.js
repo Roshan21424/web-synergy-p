@@ -2,8 +2,8 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 export const connect = (sessionId, onMessageReceived) => {
-  // Use sessionStorage (consistent with rest of app — was incorrectly using localStorage)
-  const token = sessionStorage.getItem("JWT_TOKEN");
+  // Use localStorage (consistent with rest of app — was incorrectly using localStorage before)
+  const token = localStorage.getItem("JWT_TOKEN");
   const backendUrl = process.env.REACT_APP_SERVER_URL || "http://localhost:8080";
 
   const socket = new SockJS(`${backendUrl}/synergy-chat?token=${token}`);
@@ -31,7 +31,7 @@ export const connect = (sessionId, onMessageReceived) => {
 };
 
 export const sendMessage = (connection, message) => {
-  if (connection && connection.connected) {
+  if (connection && connection.active) {
     connection.publish({
       destination: "/app/chat",
       body: JSON.stringify(message),

@@ -108,10 +108,11 @@ const UserSession = () => {
     remoteRef: remoteVideoRef,
   });
 
-  useEffect(() => {
+useEffect(() => {
     const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]));
     setStompClient(client);
-  }, [id]);
+    return () => { client?.deactivate(); };
+}, [id]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });

@@ -1,5 +1,6 @@
 package com.personal.synergy.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-
 
 @Entity
 @Data
@@ -22,7 +22,10 @@ public class Session {
     private String userId;
     private String expertId;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
+
+    @Column(nullable = true)
+    private LocalDateTime endTime;   // FIX: null until session actually ends (was set to now() on creation)
+
     private String status;
 
     public Session(String id, String userId, String expertId) {
@@ -30,8 +33,7 @@ public class Session {
         this.userId = userId;
         this.expertId = expertId;
         this.startTime = LocalDateTime.now();
-        this.endTime = LocalDateTime.now();
-        this.status="PENDING";
+        this.endTime = null;   // FIX: do not set endTime until reject/complete
+        this.status = "PENDING";
     }
-
 }

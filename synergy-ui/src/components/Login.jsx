@@ -30,8 +30,8 @@ const Login = () => {
           username: decodedToken.sub,
           roles: decodedToken.roles ? decodedToken.roles.split(",") : [],
         };
-        sessionStorage.setItem("USER", JSON.stringify(user));
-        sessionStorage.setItem("JWT_TOKEN", response.data.jwtToken);
+        localStorage.setItem("USER", JSON.stringify(user));
+        localStorage.setItem("JWT_TOKEN", response.data.jwtToken);
         setJwtToken(response.data.jwtToken);
         navigate("/home");
       }

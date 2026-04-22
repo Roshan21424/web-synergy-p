@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="17a12516-423f-45a2-acc0-32deb3d02672" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/CacheConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/EnvironmentValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/RateLimitConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/CacheConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/config/RateLimitConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SSEMangaer/SseEmitterManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SSEMangaer/SseEmitterManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SynergyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/SynergyApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/chat/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/chat/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/AuthenticationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/CallController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/CallController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/controller/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/entity/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/entity/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/SecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/SecurityConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/UserDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/security/jwtutils/JwtUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/personal/synergy/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/personal/synergy/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/components/UserSession.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/components/UserSession.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/context/ContextProvider.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/context/ContextProvider.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/routes/ProtectedRoute.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/routes/ProtectedRoute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/service/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/service/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../synergy-ui/src/service/chatService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../synergy-ui/src/service/chatService.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3CbgbeJEww7lbMAlQ1NzJxvObu3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="17a12516-423f-45a2-acc0-32deb3d02672" name="Changes" comment="" />
+      <created>1776659761669</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1776659761669</updated>
+    </task>
+    <servers />
+  </component>
+</project>

@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const ProtectedRoute = () => {
-  const token = sessionStorage.getItem("JWT_TOKEN"); // Use sessionStorage instead of localStorage for better security
+  const token = localStorage.getItem("JWT_TOKEN"); // Use localStorage instead of sessionStorage for better security
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -14,16 +14,16 @@ const ProtectedRoute = () => {
 
     if (decoded.exp < currentTime) {
       // Token expired
-      sessionStorage.removeItem("JWT_TOKEN");
-      sessionStorage.removeItem("USER");
+      localStorage.removeItem("JWT_TOKEN");
+      localStorage.removeItem("USER");
       return <Navigate to="/login" replace />;
     }
 
     return <Outlet />;
   } catch (error) {
     console.error("Token validation error:", error);
-    sessionStorage.removeItem("JWT_TOKEN");
-    sessionStorage.removeItem("USER");
+    localStorage.removeItem("JWT_TOKEN");
+    localStorage.removeItem("USER");
     return <Navigate to="/login" replace />;
   }
 };

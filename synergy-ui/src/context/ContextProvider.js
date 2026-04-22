@@ -5,10 +5,10 @@ const AppContext = createContext(undefined);
 
 export default function ContextProvider({ children }) {
   const [jwtToken, setJwtToken] = useState(() => 
-    sessionStorage.getItem("JWT_TOKEN") || null
+    localStorage.getItem("JWT_TOKEN") || null
   );
   const [user, setUser] = useState(() => {
-    const storedUser = sessionStorage.getItem("USER");
+    const storedUser = localStorage.getItem("USER");
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [sessionId, setSessionId] = useState(null);
@@ -16,9 +16,9 @@ export default function ContextProvider({ children }) {
   const [error, setError] = useState(null);
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem("JWT_TOKEN");
-    sessionStorage.removeItem("USER");
-    sessionStorage.removeItem("CSRF_TOKEN");
+    localStorage.removeItem("JWT_TOKEN");
+    localStorage.removeItem("USER");
+    localStorage.removeItem("CSRF_TOKEN");
     setJwtToken(null);
     setUser(null);
     setSessionId(null);
@@ -37,7 +37,7 @@ export default function ContextProvider({ children }) {
       try {
         const { data } = await api.get("/auth/user");
         setUser(data);
-        sessionStorage.setItem("USER", JSON.stringify(data));
+        localStorage.setItem("USER", JSON.stringify(data));
       } catch (err) {
         console.error("Failed to fetch user:", err);
         setError(err.message);

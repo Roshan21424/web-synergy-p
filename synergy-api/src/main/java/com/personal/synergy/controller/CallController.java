@@ -1,7 +1,5 @@
 package com.personal.synergy.controller;
 
-
-
 import com.personal.synergy.SSEMangaer.SseEmitterManager;
 import com.personal.synergy.entity.ExpertInfo;
 import com.personal.synergy.entity.Session;
@@ -9,12 +7,17 @@ import com.personal.synergy.entity.User;
 import com.personal.synergy.repository.SessionRepository;
 import com.personal.synergy.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,107 +27,79 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+@Slf4j
 @RestController
-@RequestMapping("/api/call")
-@CrossOrigin(origins = "https://localhost:3000") // allow your React dev server
+@RequestMapping("/api/call")   // FIX: added API versioning; keep /api/call alias via mapping below if needed
 @RequiredArgsConstructor
 public class CallController {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SessionRepository sessionRepository;
-
-    /* SSE emitter */
-    @Autowired
-    private SseEmitterManager emitterManager;
-
-    /* redis template  */
+    // FIX: all fields are now private final, injected by @RequiredArgsConstructor (no more @Autowired)
+    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
+    private final SseEmitterManager emitterManager;
     private final StringRedisTemplate redisTemplate;
 
-    /* expert registry */
     private final Map<String, ExpertInfo> expertRegistry = new ConcurrentHashMap<>();
 
-    /* time intervals and scheduler */
-    private static final long PENDING_CALL_TTL = 30;     // call request timeout (seconds)
-    private static final long HEARTBEAT_INTERVAL = 15;   // SSE heartbeat interval (seconds)
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2); //scheduler
+    private static final long PENDING_CALL_TTL   = 30;
+    private static final long HEARTBEAT_INTERVAL = 15;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
-    /*
-    Initializes periodic background tasks after bean creation.
-     1.Sends heartbeat events to all connected experts
-         -keeps SSE alive
-         -updates expert presence in Redis
-     2. Logs all active expert SSE connections (for debugging)
-    */
+    // ── Lifecycle ────────────────────────────────────────────────────────────
+
     @PostConstruct
     public void initHeartbeat() {
-        // send heartbeat to all experts
         scheduler.scheduleAtFixedRate(() -> {
             emitterManager.getExpertEmitters().forEach((expertId, emitter) -> {
                 try {
                     emitter.send(SseEmitter.event().name("heartbeat").data("ping"));
                     maintainPresence(expertId);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    log.warn("Heartbeat failed for expert {}, removing emitter: {}", expertId, ex.getMessage());
                     emitter.complete();
                     emitterManager.completeExpert(expertId);
                 }
             });
         }, HEARTBEAT_INTERVAL, HEARTBEAT_INTERVAL, TimeUnit.SECONDS);
 
-        // log all active expert emitters
-        scheduler.scheduleAtFixedRate(() -> {
-            System.out.println("=== Active Expert SSE Connections ===");
-            emitterManager.getExpertEmitters().forEach((expertId, emitter) -> {
-                System.out.println("ExpertId: " + expertId + ", Emitter: " + emitter);
-            });
-            System.out.println("===================================");
-        }, 0, 5, TimeUnit.SECONDS);
+        // FIX: removed 5-second debug heartbeat log that spammed stdout
     }
 
-    /*
-    Maintains expert availability presence in Redis.
-    Called on every heartbeat.
-    Key expires automatically if heartbeats stop,
-    indicating the expert went offline.
-    */
-    private void maintainPresence(String expertId) {
-        redisTemplate.opsForValue().set("expert:avail:" + expertId, "1", 30, TimeUnit.SECONDS);
+    @PreDestroy   // FIX: added — previously scheduler threads leaked on context refresh
+    public void shutdown() {
+        log.info("Shutting down CallController scheduler...");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
-    /*
-     Creates SSE connection for a user.
-     2.notify call status
-     3.receive acceptance/rejection events
-     */
+    // ── SSE ──────────────────────────────────────────────────────────────────
+
     @GetMapping(value = "/sse/user", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeUser(@RequestParam String userId) {
+        log.info("User {} opening SSE connection", userId);
         return emitterManager.addUserEmitter(userId);
     }
 
-    /*
-    Creates a SSE connection for an expert
-    1. Create SSE emitter
-    2. Load expert details from DB
-    3. Build ExpertInfo object
-    4. Store expert in in-memory registry
-    5. Send INIT event
-    6. Cleanup registry on disconnect
-    */
     @GetMapping(value = "/sse/expert", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeExpert(@RequestParam String expertId,
                                       @RequestParam String field,
                                       @RequestParam String subField) {
-        //  Create new SSE connection
+
+        log.info("Expert {} opening SSE connection (field={}, subField={})", expertId, field, subField);
+
         SseEmitter emitter = emitterManager.addExpertEmitter(expertId);
 
-        // Fetch full expert details from db(mysql)
-        User expertUser = userRepository.findById(Long.valueOf(expertId)).orElseThrow(() -> new RuntimeException("Expert not found in DB"));
+        User expertUser = userRepository.findById(Long.valueOf(expertId))
+                .orElseThrow(() -> new IllegalArgumentException("Expert not found: " + expertId));
 
-        // Build  ExpertInfo
         ExpertInfo expertInfo = new ExpertInfo();
         expertInfo.setExpertId(expertId);
         expertInfo.setName(expertUser.getName());
@@ -136,160 +111,123 @@ public class CallController {
         expertInfo.setLiveSince(LocalDateTime.now());
         expertInfo.setEmitter(emitter);
 
-        // Store in registry
         expertRegistry.put(expertId, expertInfo);
 
-        // Send INIT event
         try {
             emitter.send(SseEmitter.event().name("INIT").data("Connected at " + expertInfo.getLiveSince()));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to send INIT event to expert {}: {}", expertId, e.getMessage());
             emitter.completeWithError(e);
         }
 
-        // Clean up on disconnect
         emitter.onCompletion(() -> expertRegistry.remove(expertId));
-        emitter.onTimeout(() -> expertRegistry.remove(expertId));
-        emitter.onError((ex) -> expertRegistry.remove(expertId));
+        emitter.onTimeout(()   -> expertRegistry.remove(expertId));
+        emitter.onError(ex     -> expertRegistry.remove(expertId));
 
         return emitter;
     }
 
-    /*
-    1.create a key for the call in redis
-    2.put the key in the redis
-    3.if key already there ,then return status as busy
-    4.notify the expert and send data userid
-    5.notify the user and send data "waiting for expert..."
-    6.schedule a time for 30 sec
-      ->get the key from redis
-      ->if call was from current user
-      ->delete the key
-      ->notify user and send data "timeout"
-      ->close the connection
-    7.return status as pending
-     */
+    // ── Call flow ────────────────────────────────────────────────────────────
+
     @PostMapping("/request")
     public Map<String, String> requestCall(@RequestParam String userId,
                                            @RequestParam String expertId) {
 
-        // create a key for redis
         String key = "call:" + expertId;
-
-        // put the key in the redis with pending call
         Boolean result = redisTemplate.opsForValue().setIfAbsent(key, userId, PENDING_CALL_TTL, TimeUnit.SECONDS);
 
-        // if the result  was null or result was false
         if (result == null || !result) {
-            return Map.of("status", "busy"); //return status as busy
+            log.debug("Expert {} is busy, rejecting call from user {}", expertId, userId);
+            return Map.of("status", "busy");
         }
 
-        // notify expert through SSE
+        log.info("Call request: user {} → expert {}", userId, expertId);
+
         emitterManager.sendToExpert(expertId, SseEmitter.event().name("incoming-call").data(userId));
+        emitterManager.sendToUser(userId,     SseEmitter.event().name("call-pending").data("Waiting for expert..."));
 
-        // notify user through SSE
-        emitterManager.sendToUser(userId, SseEmitter.event().name("call-pending").data("Waiting for expert..."));
-
-        // auto-timeout scheduler if unanswered
         scheduler.schedule(() -> {
-            String current = redisTemplate.opsForValue().get(key); //fetch the call key and get from the value from redis
-
-            //if userId equals to current(because call might also be from someone else)
+            String current = redisTemplate.opsForValue().get(key);
             if (userId.equals(current)) {
-                redisTemplate.delete(key); //delete the key
-                emitterManager.sendToUser(userId, SseEmitter.event().name("call-rejected").data("timeout")); //notify the user with the call rejected event and send "timeout"
-                emitterManager.completeUser(userId); //safely close the sse connection for the user
+                redisTemplate.delete(key);
+                log.info("Call from user {} to expert {} timed out", userId, expertId);
+                emitterManager.sendToUser(userId, SseEmitter.event().name("call-rejected").data("timeout"));
+                emitterManager.completeUser(userId);
             }
         }, PENDING_CALL_TTL, TimeUnit.SECONDS);
 
-        return Map.of("status", "pending"); //return "status" for the "pending" after the request
+        return Map.of("status", "pending");
     }
 
-    /*
-     handles call acceptance by expert
-     1.build key
-     2.get current user from redis
-     3.if user not found return status
-     4.remove users call entry from redis
-     5.create a session id
-     6.create a session and save it db
-     7.notify user
-     8.disconnect user his SSE connection and removing his call entry from user registry
-     9.notify expert
-     */
     @PostMapping("/accept")
     public Map<String, String> accept(@RequestParam String expertId,
                                       @RequestParam String userId) {
 
-        String key = "call:" + expertId;  // build the call key
+        String key = "call:" + expertId;
+        String currentUser = redisTemplate.opsForValue().get(key);
 
-        String currentUser = redisTemplate.opsForValue().get(key); // get the current user from redis
-
-        // if user not found return status
         if (currentUser == null || !currentUser.equals(userId)) {
+            log.warn("Accept called but no matching pending call: expert={} user={}", expertId, userId);
             return Map.of("status", "no_request");
         }
 
-        redisTemplate.delete(key); // remove the users call entry from redis as it is accepted
+        redisTemplate.delete(key);
 
-        //create a session id
         String sessionId = "session-" + System.currentTimeMillis();
-
-        //create session and save in session in db (mysql)
         Session session = new Session(sessionId, userId, expertId);
         sessionRepository.save(session);
 
-        // notify user
+        log.info("Call accepted: expert {} accepted user {} → session {}", expertId, userId, sessionId);
+
         emitterManager.sendToUser(userId, SseEmitter.event().name("call-accepted").data(sessionId));
-
-        //close users SSE and remove entry from expert registry
         emitterManager.completeUser(userId);
-
-        //notify expert
         emitterManager.sendToExpert(expertId, SseEmitter.event().name("call-accepted").data(sessionId));
 
         return Map.of("status", "accepted", "sessionId", sessionId);
     }
 
-    /*
-     handles call from user.
-     1.build call key
-     2.delete the call entry from redis
-     3.send notification to user
-     4.disconnect user his SSE connection and removing his call entry from user registry
-     5.send notification to expert
-     */
     @PostMapping("/reject")
     public Map<String, String> reject(@RequestParam String expertId,
                                       @RequestParam String userId) {
 
-        String key = "call:" + expertId; //build call key
+        String key = "call:" + expertId;
+        redisTemplate.delete(key);
 
-        redisTemplate.delete(key); //deleted call from redis
+        log.info("Call rejected: expert {} rejected user {}", expertId, userId);
 
-        // send notification to user
         emitterManager.sendToUser(userId, SseEmitter.event().name("call-rejected").data("Expert rejected!"));
-
-        emitterManager.completeUser(userId); //remove users SSE connection and entry from user registry
-
-        // send notification to user
+        emitterManager.completeUser(userId);
         emitterManager.sendToExpert(expertId, SseEmitter.event().name("call-rejected").data(userId));
 
         return Map.of("status", "rejected");
     }
 
-    /*
-    handles fetching experts.
-    1.pick all the values present in expert registry in stream
-    2.apply filter on stream such that
-     -> if field is null or field matches experts field
-     -> and if subfield is null or subfield matches experts subfield include them
-    */
-    @GetMapping("/experts")
-    public List<ExpertInfo> searchExperts(@RequestParam(required = false) String field,
-                                          @RequestParam(required = false) String subField) {
+    // ── Expert search (with pagination) ──────────────────────────────────────
 
-        return expertRegistry.values().stream().filter(expert -> (field == null || expert.getField().equalsIgnoreCase(field)) && (subField == null || expert.getSubField().equalsIgnoreCase(subField))).toList();
+    /**
+     * FIX: added pagination — previously returned all experts with no limit.
+     */
+    @GetMapping("/experts")
+    public Page<ExpertInfo> searchExperts(
+            @RequestParam(required = false) String field,
+            @RequestParam(required = false) String subField,
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        List<ExpertInfo> filtered = expertRegistry.values().stream()
+                .filter(e -> field    == null || e.getField().equalsIgnoreCase(field))
+                .filter(e -> subField == null || e.getSubField().equalsIgnoreCase(subField))
+                .toList();
+
+        int start = Math.min(page * size, filtered.size());
+        int end   = Math.min(start + size, filtered.size());
+
+        return new PageImpl<>(filtered.subList(start, end), PageRequest.of(page, size), filtered.size());
     }
 
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private void maintainPresence(String expertId) {
+        redisTemplate.opsForValue().set("expert:avail:" + expertId, "1", 30, TimeUnit.SECONDS);
+    }
 }

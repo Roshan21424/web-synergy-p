@@ -14,13 +14,13 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     // Add JWT token if available
-    const jwtToken = sessionStorage.getItem("JWT_TOKEN");
+    const jwtToken = localStorage.getItem("JWT_TOKEN");
     if (jwtToken) {
       config.headers.Authorization = `Bearer ${jwtToken}`;
     }
 
     // Handle CSRF token
-    let csrfToken = sessionStorage.getItem("CSRF_TOKEN");
+    let csrfToken = localStorage.getItem("CSRF_TOKEN");
     
     if (!csrfToken) {
       try {
@@ -29,7 +29,7 @@ api.interceptors.request.use(
           { withCredentials: true }
         );
         csrfToken = response.data.token;
-        sessionStorage.setItem("CSRF_TOKEN", csrfToken);
+        localStorage.setItem("CSRF_TOKEN", csrfToken);
       } catch (error) {
         console.error("Error fetching CSRF token:", error);
       }
@@ -52,9 +52,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Unauthorized - clear tokens and redirect to login
-      sessionStorage.removeItem("JWT_TOKEN");
-      sessionStorage.removeItem("USER");
-      sessionStorage.removeItem("CSRF_TOKEN");
+      localStorage.removeItem("JWT_TOKEN");
+      localStorage.removeItem("USER");
+      localStorage.removeItem("CSRF_TOKEN");
       window.location.href = "/login";
     }
     return Promise.reject(error);
