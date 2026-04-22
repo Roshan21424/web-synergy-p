@@ -189,3 +189,16 @@ async function flushPendingIce() {
     }
   }
 }
+
+// ADD this at the bottom of scripts.js:
+export const cleanupCall = () => {
+  socket?.disconnect();
+  peerConnection?.close();
+  localStream?.getTracks().forEach(t => t.stop());
+  socket = null;
+  peerConnection = null;
+  localStream = null;
+  remoteStream = null;
+  pendingSignals = [];
+  pendingIce = [];
+};

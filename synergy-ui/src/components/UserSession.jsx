@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Call } from "../service/scripts";
+import { Call ,cleanupCall} from "../service/scripts";
 import { connect, sendMessage } from "../service/chatService.js";
-import { Mic, MicOff, Video, VideoOff, PhoneOff, User, ArrowLeft, Send } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  PhoneOff,
+  User,
+  ArrowLeft,
+  Send,
+} from "lucide-react";
 import { useMyContext } from "../context/ContextProvider.js";
 
 // ── Video box ─────────────────────────────────────────────────────────────────
@@ -14,8 +23,16 @@ const VideoBox = ({ refVideo, label, loading, micOff, videoOff, muted }) => (
         <User size={12} className="text-white" />
       </div>
       <span className="text-xs font-medium text-white">{label}</span>
-      {micOff   && <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">Muted</span>}
-      {videoOff && <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">No video</span>}
+      {micOff && (
+        <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">
+          Muted
+        </span>
+      )}
+      {videoOff && (
+        <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">
+          No video
+        </span>
+      )}
     </div>
     {loading && (
       <div className="absolute inset-0 bg-slate-900 flex items-center justify-center z-20">
@@ -23,7 +40,13 @@ const VideoBox = ({ refVideo, label, loading, micOff, videoOff, muted }) => (
       </div>
     )}
     {/* muted must be a boolean attribute, not state-driven for remote video */}
-    <video ref={refVideo} className="w-full h-full object-cover" autoPlay playsInline muted={muted} />
+    <video
+      ref={refVideo}
+      className="w-full h-full object-cover"
+      autoPlay
+      playsInline
+      muted={muted}
+    />
   </div>
 );
 
@@ -37,37 +60,38 @@ const VideoBox = ({ refVideo, label, loading, micOff, videoOff, muted }) => (
 
 const UserSession = () => {
   const { id, expert } = useParams();
-  const navigate       = useNavigate();
-  const { user }       = useMyContext();
+  const navigate = useNavigate();
+  const { user } = useMyContext();
 
-  const localVideoRef  = useRef(null);
+  const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const chatEndRef     = useRef(null);
+  const chatEndRef = useRef(null);
 
-  const [messages, setMessages]         = useState([]);
-  const [input, setInput]               = useState("");
-  const [stompClient, setStompClient]   = useState(null);
-  const [localMic, setLocalMic]         = useState(true);
-  const [localCam, setLocalCam]         = useState(true);
-  const [loadingLocal, setLoadingLocal]  = useState(true);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [stompClient, setStompClient] = useState(null);
+  const [localMic, setLocalMic] = useState(true);
+  const [localCam, setLocalCam] = useState(true);
+  const [loadingLocal, setLoadingLocal] = useState(true);
   const [loadingRemote, setLoadingRemote] = useState(true);
-  const [myUserName]   = useState(user?.username ?? "");
+  const [myUserName] = useState(user?.username ?? "");
 
   // ── WebRTC (single socket connection via Call()) ──────────────────────────
   useEffect(() => {
     if (!id || !myUserName) return;
 
-    const localVideo  = localVideoRef.current;
+    const localVideo = localVideoRef.current;
     const remoteVideo = remoteVideoRef.current;
 
     Call(myUserName, id, localVideo, remoteVideo, "user", {
-      onLocalStreamReady:  () => setLoadingLocal(false),
+      onLocalStreamReady: () => setLoadingLocal(false),
       onRemoteStreamReady: () => setLoadingRemote(false),
     });
 
+    // TO:
     return () => {
+      cleanupCall();
       [localVideo, remoteVideo].forEach((vid) => {
-        vid?.srcObject?.getTracks().forEach((t) => t.stop());
         if (vid) vid.srcObject = null;
       });
     };
@@ -77,7 +101,9 @@ const UserSession = () => {
   useEffect(() => {
     const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]));
     setStompClient(client);
-    return () => { client?.deactivate(); };
+    return () => {
+      client?.deactivate();
+    };
   }, [id]);
 
   useEffect(() => {
@@ -93,7 +119,11 @@ const UserSession = () => {
 
   const handleSend = () => {
     if (!input.trim() || !stompClient?.active) return;
-    sendMessage(stompClient, { service: { id }, senderId: myUserName, content: input });
+    sendMessage(stompClient, {
+      service: { id },
+      senderId: myUserName,
+      content: input,
+    });
     setInput("");
   };
 
@@ -117,28 +147,44 @@ const UserSession = () => {
             <ArrowLeft size={18} />
           </button>
           <div>
-            <p className="text-sm font-medium text-slate-900">Session with {expert}</p>
+            <p className="text-sm font-medium text-slate-900">
+              Session with {expert}
+            </p>
             <p className="text-xs text-slate-400 font-mono">{id}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { toggleTrack("audio"); setLocalMic((v) => !v); }}
+            onClick={() => {
+              toggleTrack("audio");
+              setLocalMic((v) => !v);
+            }}
             disabled={loadingLocal}
             className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
             title={localMic ? "Mute" : "Unmute"}
           >
-            {localMic ? <Mic size={15} /> : <MicOff size={15} className="text-red-500" />}
+            {localMic ? (
+              <Mic size={15} />
+            ) : (
+              <MicOff size={15} className="text-red-500" />
+            )}
           </button>
 
           <button
-            onClick={() => { toggleTrack("video"); setLocalCam((v) => !v); }}
+            onClick={() => {
+              toggleTrack("video");
+              setLocalCam((v) => !v);
+            }}
             disabled={loadingLocal}
             className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
             title={localCam ? "Stop video" : "Start video"}
           >
-            {localCam ? <Video size={15} /> : <VideoOff size={15} className="text-red-500" />}
+            {localCam ? (
+              <Video size={15} />
+            ) : (
+              <VideoOff size={15} className="text-red-500" />
+            )}
           </button>
 
           <button
@@ -179,7 +225,9 @@ const UserSession = () => {
 
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {messages.length === 0 && (
-              <p className="text-slate-400 text-center mt-10 text-sm">No messages yet.</p>
+              <p className="text-slate-400 text-center mt-10 text-sm">
+                No messages yet.
+              </p>
             )}
             {messages.map((m, i) => (
               <div

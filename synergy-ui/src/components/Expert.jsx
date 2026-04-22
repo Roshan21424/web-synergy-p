@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMyContext } from "../context/ContextProvider";
 import api from "../service/api";
 import { Loader2, ArrowLeft, Phone, PhoneOff, Wifi, WifiOff } from "lucide-react";
-import { EXPERT_FIELDS, getSubFields } from "../constants/expertFields";
+import { EXPERT_FIELDS, getSubFields } from "./expertFields";
 
 // ── Field selector sub-component ─────────────────────────────────────────────
 

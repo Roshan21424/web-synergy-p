@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Call } from "../service/scripts";
+import { Call ,cleanupCall} from "../service/scripts";
 import { User, PhoneOff, ArrowLeft, Send } from "lucide-react";
 import { connect, sendMessage } from "../service/chatService.js";
 import { useMyContext } from "../context/ContextProvider.js";
@@ -12,8 +12,16 @@ const VideoBox = ({ refVideo, label, loading, micOff, videoOff }) => (
         <User size={12} className="text-white" />
       </div>
       <span className="text-xs font-medium text-white">{label}</span>
-      {micOff && <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">Muted</span>}
-      {videoOff && <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">No video</span>}
+      {micOff && (
+        <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">
+          Muted
+        </span>
+      )}
+      {videoOff && (
+        <span className="text-xs bg-red-500/80 text-white px-1.5 py-0.5 rounded">
+          No video
+        </span>
+      )}
     </div>
     {loading && (
       <div className="absolute inset-0 bg-slate-900 flex items-center justify-center z-20">
@@ -50,7 +58,9 @@ const ExpertSession = () => {
   useEffect(() => {
     const client = connect(id, (msg) => setMessages((prev) => [...prev, msg]));
     setStompClient(client);
-    return () => { client?.disconnect?.() };
+    return () => {
+      client?.deactivate?.();
+    };
   }, [id]);
 
   useEffect(() => {
@@ -59,12 +69,18 @@ const ExpertSession = () => {
 
   const handleSend = () => {
     if (!input.trim() || !stompClient?.connected) return;
-    const message = { service: { id: sessionId }, senderId: myUserName, content: input };
+    const message = {
+      service: { id: sessionId },
+      senderId: myUserName,
+      content: input,
+    };
     sendMessage(stompClient, message);
     setInput("");
   };
 
-  const handleKeyPress = (e) => { if (e.key === "Enter") handleSend() };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") handleSend();
+  };
 
   useEffect(() => {
     if (!sessionId) return;
@@ -74,9 +90,10 @@ const ExpertSession = () => {
       onLocalStreamReady: () => setLoadingLocal(false),
       onRemoteStreamReady: () => setLoadingRemote(false),
     });
+    // TO:
     return () => {
+      cleanupCall();
       [localVideo, remoteVideo].forEach((vid) => {
-        vid?.srcObject?.getTracks().forEach((t) => t.stop());
         if (vid) vid.srcObject = null;
       });
     };
@@ -95,7 +112,10 @@ const ExpertSession = () => {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-5 py-3.5 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="p-1.5 text-slate-500 hover:text-slate-900 transition-colors">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1.5 text-slate-500 hover:text-slate-900 transition-colors"
+          >
             <ArrowLeft size={18} />
           </button>
           <div>
@@ -116,8 +136,18 @@ const ExpertSession = () => {
       <div className="flex flex-1 md:flex-row flex-col overflow-hidden">
         {/* Video column */}
         <div className="md:w-72 lg:w-80 flex-shrink-0 flex flex-col gap-3 p-4 bg-slate-900">
-          <VideoBox refVideo={localVideoRef} label={`You (${myUserName})`} loading={loadingLocal} micOff={!localMic} videoOff={!localCam} />
-          <VideoBox refVideo={remoteVideoRef} label="Participant" loading={loadingRemote} />
+          <VideoBox
+            refVideo={localVideoRef}
+            label={`You (${myUserName})`}
+            loading={loadingLocal}
+            micOff={!localMic}
+            videoOff={!localCam}
+          />
+          <VideoBox
+            refVideo={remoteVideoRef}
+            label="Participant"
+            loading={loadingRemote}
+          />
         </div>
 
         {/* Chat column */}
@@ -128,19 +158,28 @@ const ExpertSession = () => {
 
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {messages.length === 0 && (
-              <p className="text-slate-400 text-center mt-10 text-sm">No messages yet.</p>
+              <p className="text-slate-400 text-center mt-10 text-sm">
+                No messages yet.
+              </p>
             )}
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.senderId === myUserName ? "justify-end" : "justify-start"}`}>
+              <div
+                key={i}
+                className={`flex ${m.senderId === myUserName ? "justify-end" : "justify-start"}`}
+              >
                 <div className="max-w-xs">
-                  <p className={`text-xs font-medium mb-1 ${m.senderId === myUserName ? "text-right text-slate-400" : "text-left text-slate-500"}`}>
+                  <p
+                    className={`text-xs font-medium mb-1 ${m.senderId === myUserName ? "text-right text-slate-400" : "text-left text-slate-500"}`}
+                  >
                     {m.senderId}
                   </p>
-                  <div className={`px-4 py-2.5 rounded-xl text-sm ${
-                    m.senderId === myUserName
-                      ? "bg-blue-600 text-white rounded-br-sm"
-                      : "bg-slate-100 text-slate-900 rounded-bl-sm"
-                  }`}>
+                  <div
+                    className={`px-4 py-2.5 rounded-xl text-sm ${
+                      m.senderId === myUserName
+                        ? "bg-blue-600 text-white rounded-br-sm"
+                        : "bg-slate-100 text-slate-900 rounded-bl-sm"
+                    }`}
+                  >
                     {m.content}
                   </div>
                 </div>

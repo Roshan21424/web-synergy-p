@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"password", "twoFactorSecret"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

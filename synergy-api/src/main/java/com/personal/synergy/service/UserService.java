@@ -3,6 +3,7 @@ package com.personal.synergy.service;
 import com.personal.synergy.entity.User;
 import com.personal.synergy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,6 +14,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    // In UserService.java, change saveUser to:
+    @CacheEvict(value = "userDetails", key = "#user.name")
     public User saveUser(User user) {
         return userRepository.save(user);
     }
